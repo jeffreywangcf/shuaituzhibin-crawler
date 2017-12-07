@@ -15,7 +15,7 @@ class Crawler:
         self.url_manager = url_manager.UrlManager()
         self.parser = parser.Parser()
         self.downloader = downloader.Downloader(start_url)
-        self.outputer = outputer.Outputer()
+        self.outputer = outputer.Outputer("demo", "ShuaiTuZhiBin_Dataset")
         self.count = int()
         self.thread_pool_size = thread_pool_size
 

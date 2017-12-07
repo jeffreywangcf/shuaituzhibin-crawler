@@ -24,6 +24,8 @@ class Parser:
         basic_info = body.h1.text
         name, country, kind = basic_info.strip(" ").split("-")
         image_address = soup.find("span", class_="role-img").img['src']
+        raw_star = soup.find("i", class_="role-img-mask")["class"][-1]
+        star = int(re.search("[1-5]", raw_star).group())
         description = body.find('p', class_="desc").text.strip()
         description = description.replace("\n", "").replace("\r", "")
         attributes = body.find_all("p", class_="attr-list")
@@ -38,9 +40,16 @@ class Parser:
                     data_list.append(float(res))
                 else:
                     data_list.append(int(res))
+        cost = data_list[0]
+        attack_range = data_list[1]
+        ruse = data_list[2]
+        attack = data_list[3]
+        seige = data_list[4]
+        defand = data_list[5]
+        speed = data_list[6]
         raw_skills = body.find_all("dl", class_="group")
         if len(raw_skills) == 1:
-            carry_skill = raw_skills.text.replace(" ", "").replace("\n", "")[0][5::]
+            carry_skill = raw_skills[0].text.replace(" ", "").replace("\n", "")[0][5::]
             decomposable_skill = "无"
         else:
             skills = list()
