@@ -8,3 +8,5 @@ by replacing:
 
 `start_url = "https://www.example1.com"` to `start_url = "https://www.example2.com"`
 
+![alt text](https://github.com/JeffreyWang2864/shuaituzhibin-crawler/blob/master/images/stzb_running.png)
+![alt text](https://github.com/JeffreyWang2864/shuaituzhibin-crawler/blob/master/images/stzb_data.png)
