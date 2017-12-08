@@ -10,3 +10,5 @@ by replacing:
 
 ![alt text](https://github.com/JeffreyWang2864/shuaituzhibin-crawler/blob/master/images/stzb_running.png)
 ![alt text](https://github.com/JeffreyWang2864/shuaituzhibin-crawler/blob/master/images/stzb_data.png)
+
+[view result](https://github.com/JeffreyWang2864/shuaituzhibin-crawler/blob/master/shuaituzhibin_db.sql)
