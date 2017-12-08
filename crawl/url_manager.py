@@ -18,10 +18,13 @@ class UrlManager:
         if urls is None:
             return
         if isinstance(urls, list) or isinstance(urls, tuple):
+            urls = list(filter(lambda item: item != "javascript:;", urls))
             new_urls = set(urls) - (set(urls) & self.archived_url)
             self.queue = self.queue | new_urls
         else:
             if urls not in self.archived_url:
+                if urls == "javascript:;":
+                    return
                 self.queue.add(urls)
 
     def isEmpty(self):

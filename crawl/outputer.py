@@ -3,32 +3,21 @@ import MySQLdb as mysql
 class Outputer:
 
     def __init__(self, database, table):
-        self.name = list()
-        self.country = list()
-        self.star = list()
-        self.image_address = list()
-        self.description = list()
-        self.kind = list()
-        self.cost = list()
-        self.attack_range = list()
-        self.attack = list()
-        self.ruse = list()
-        self.seige = list()
-        self.defand = list()
-        self.speed = list()
-        self.carry_skill = list()
-        self.decomposable_skill = list()
+        self.data = list()
         self.input_length = 15
+        self.order = ("名字", "国家", "星级", "图片地址", "描述", "兵种", "cost",
+                     "攻击距离", "攻击", "策略", "攻城", "防御", "速度", "战法", "可拆解战法")
 
         with open("/Users/Excited/localmysqlrootssh.txt", "r")as f:
             local_info = f.readlines()   #host, username, passwd, port
+            local_info = list(map(str.strip, local_info))
             try:
                 self.connection = mysql.connect(
                     host=local_info[0],
                     user=local_info[1],
                     passwd=local_info[2],
                     db=database,
-                    port=local_info[3],
+                    port=int(local_info[3]),
                     charset="utf8"
                 )
             except mysql.Error as e:
@@ -36,30 +25,16 @@ class Outputer:
         self.cursor = self.connection.cursor()
         self.table = table
 
-    def __del__(self):
-        self.closeConnection()
-
     def closeConnection(self):
         if self.connection:
             self.connection.close()
 
+    def __del__(self):
+        self.closeConnection()
+
     def collectData(self, *args):
         assert len(*args) == self.input_length
-        self.name.append(*args[0])
-        self.country.append(*args[1])
-        self.star.append(*args[2])
-        self.image_address.append(*args[3])
-        self.description.append(*args[4])
-        self.kind.append(*args[5])
-        self.cost.append(*args[6])
-        self.attack_range.append(*args[7])
-        self.attack.append(*args[8])
-        self.ruse.append(*args[9])
-        self.seige.append(*args[10])
-        self.defand.append(*args[11])
-        self.speed.append(*args[12])
-        self.carry_skill.append(*args[13])
-        self.decomposable_skill.append(*args[14])
+        self.data.append(tuple(*args))
 
     def getFormat(self):
         self.cursor.execute("desc %s"%self.table)
@@ -112,11 +87,15 @@ class Outputer:
             print("error")
             self.connection.rollback()
 
-    def addRows(self, label, data):
+    def addRows(self, label = None, data = None):
+        if label is None:
+            label = self.order
+        if data is None:
+            data = self.data
         try:
-            front_command = "insert into " + self.table + "(" + ", ".join(["`" + str(item) + "`" for item in label]) + ")"
+            front_command = "insert into " + self.table + "(" + ", ".join(["`" + str(item).replace("\"", "") + "`" for item in label]) + ")"
             for row in data:
-                self.execute(front_command + "VALUE(" + ", ".join(['"' + str(item) + '"' for item in row]) + ");")
+                self.execute(front_command + "VALUE(" + ", ".join(['"' + str(item).replace("\"", "") + '"' for item in row]) + ");")
             self.connection.commit()
         except mysql.Error as e:
             print("error: %s"%e)

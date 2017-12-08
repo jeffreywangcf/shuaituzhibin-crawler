@@ -15,7 +15,7 @@ class Crawler:
         self.url_manager = url_manager.UrlManager()
         self.parser = parser.Parser()
         self.downloader = downloader.Downloader(start_url)
-        self.outputer = outputer.Outputer("demo", "ShuaiTuZhiBin_Dataset")
+        self.outputer = outputer.Outputer("demo", "ShuaiTuZhiBin_Database")
         self.count = int()
         self.thread_pool_size = thread_pool_size
 
@@ -38,8 +38,10 @@ class Crawler:
             new_urls, next_page_tag = self.parser.parse(raw_html, self.downloader.start_url)
             self.url_manager.addNewUrl(new_urls)
         while not self.url_manager.isEmpty():
+        #while self.count < 10:
             new_url = self.url_manager.getUrl()
             parse_once(new_url)
+        self.outputer.addRows()
 
 
 

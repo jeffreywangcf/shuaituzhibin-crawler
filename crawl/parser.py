@@ -57,3 +57,5 @@ class Parser:
                 skills.append(item.text.replace(" ", "").replace("\n", ""))
             carry_skill = skills[0][5::]
             decomposable_skill = skills[-1][5::]
+        return (name, country, star, image_address, description, kind, cost,
+                attack_range, attack, ruse, seige, defand, speed, carry_skill, decomposable_skill)
