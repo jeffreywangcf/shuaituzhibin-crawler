@@ -11,15 +11,22 @@ from concurrent.futures import ThreadPoolExecutor as tpe
 
 class Crawler:
 
-    def __init__(self, start_url, thread_pool_size = 3):
+    def __init__(self, start_url, thread_pool_size = 5):
+        self.count = int()
+        self.thread_pool_size = thread_pool_size
+        self.buffer_trigger = Event()
         self.url_manager = url_manager.UrlManager()
         self.parser = parser.Parser()
         self.downloader = downloader.Downloader(start_url)
-        self.outputer = outputer.Outputer("demo", "ShuaiTuZhiBin_Database")
-        self.count = int()
-        self.thread_pool_size = thread_pool_size
+        self.outputer = outputer.Outputer(self.buffer_trigger, "demo", "ShuaiTuZhiBin_Database")
 
     def startCrawl(self, toggle_print = True):
+
+        def parse_new_urls():
+            while self.downloader.updatePageSource():
+                raw_html = self.downloader.downloadPageSource()
+                new_urls, next_page_tag = self.parser.parse(raw_html, self.downloader.start_url)
+                self.url_manager.addNewUrl(new_urls)
 
         def parse_once(in_url):
             if toggle_print:
@@ -33,15 +40,19 @@ class Crawler:
         new_urls, next_page_tag = self.parser.parse(raw_html, self.downloader.start_url)
         self.downloader.next_page_tag = next_page_tag
         self.url_manager.addNewUrl(new_urls)
-        while self.downloader.updatePageSource():
-            raw_html = self.downloader.downloadPageSource()
-            new_urls, next_page_tag = self.parser.parse(raw_html, self.downloader.start_url)
-            self.url_manager.addNewUrl(new_urls)
+        gainNewUrlsThread = Thread(target=parse_new_urls)
+        gainNewUrlsThread.run()
+        executor = tpe(self.thread_pool_size)
         while not self.url_manager.isEmpty():
-        #while self.count < 10:
-            new_url = self.url_manager.getUrl()
-            parse_once(new_url)
-        self.outputer.addRows()
+            all_urls = self.url_manager.getUrls()
+            executor.map(parse_once, all_urls)
+            if self.outputer.data_count > self.outputer.buffer_size:
+                self.buffer_trigger.set()
+        self.outputer.end_writing = True
+        self.buffer_trigger.set()
+        executor.shutdown(wait=True)
+
+
 
 
 

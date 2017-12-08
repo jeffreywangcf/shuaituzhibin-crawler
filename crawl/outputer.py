@@ -2,9 +2,14 @@ import MySQLdb as mysql
 
 class Outputer:
 
-    def __init__(self, database, table):
+    def __init__(self, e, database, table):
         self.data = list()
         self.input_length = 15
+        self.total_data_count = int()
+        self.data_count = int()
+        self.buffer_trigger = e
+        self.buffer_size = 50
+        self.end_writing = False
         self.order = ("名字", "国家", "星级", "图片地址", "描述", "兵种", "cost",
                      "攻击距离", "攻击", "策略", "攻城", "防御", "速度", "战法", "可拆解战法")
 
@@ -35,6 +40,15 @@ class Outputer:
     def collectData(self, *args):
         assert len(*args) == self.input_length
         self.data.append(tuple(*args))
+        self.data_count += 1
+
+    def exportData(self):
+        while not self.end_writing:
+            self.buffer_trigger.wait()
+            self.addRows()
+            self.data = list()
+            self.total_data_count += self.data_count
+            self.data_count = int()
 
     def getFormat(self):
         self.cursor.execute("desc %s"%self.table)
