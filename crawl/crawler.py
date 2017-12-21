@@ -22,13 +22,13 @@ class Crawler:
 
     def startCrawl(self, toggle_print = True):
 
-        def parse_new_urls():
+        def parse_new_urls():           #parse catalog page that returns urls of hero page
             while self.downloader.updatePageSource():
                 raw_html = self.downloader.downloadPageSource()
                 new_urls, next_page_tag = self.parser.parse(raw_html, self.downloader.start_url)
                 self.url_manager.addNewUrl(new_urls)
 
-        def parse_once(in_url):
+        def parse_detail(in_url):        #parse hero pages
             if toggle_print:
                 print("%d: gathering data from: %s" % (self.count, in_url))
             page_source = self.downloader.getPageSourceViaRequest(in_url)
@@ -45,7 +45,7 @@ class Crawler:
         executor = tpe(self.thread_pool_size)
         while not self.url_manager.isEmpty():
             all_urls = self.url_manager.getUrls()
-            executor.map(parse_once, all_urls)
+            executor.map(parse_detail, all_urls)
             if self.outputer.data_count > self.outputer.buffer_size:
                 self.buffer_trigger.set()
         self.outputer.end_writing = True
