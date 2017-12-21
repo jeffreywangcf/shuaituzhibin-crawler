@@ -22,13 +22,13 @@ class Crawler:
 
     def startCrawl(self, toggle_print = True):
 
-        def parse_new_urls():           #parse catalog page that returns urls of hero page
+        def parse_new_urls():           #parse catalog page that returns(gets) urls of hero page
             while self.downloader.updatePageSource():
                 raw_html = self.downloader.downloadPageSource()
                 new_urls, next_page_tag = self.parser.parse(raw_html, self.downloader.start_url)
                 self.url_manager.addNewUrl(new_urls)
 
-        def parse_detail(in_url):        #parse hero pages
+        def parse_detail(in_url):        #parse hero page
             if toggle_print:
                 print("%d: gathering data from: %s" % (self.count, in_url))
             page_source = self.downloader.getPageSourceViaRequest(in_url)
